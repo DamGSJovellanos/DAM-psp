@@ -1,0 +1,16 @@
+def construir_tablero(cantidad_filas):
+    #return [[]for x in range (filas)]
+    tablero = []
+    for i in range(cantidad_filas):
+        fila = []
+        for j in range(cantidad_filas):
+            fila.append("")
+        tablero.append([fila])
+    return tablero
+
+def mostrar_tablero (tablero):
+    for fila in range(len(tablero)):
+        if fila != 0:
+            print("_" * (17(len(tablero))))
+
+tablero = construir_tablero(3)

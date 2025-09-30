@@ -1,0 +1,21 @@
+Menu = ["lunes", "comida 1", "lunes", "comida 2"]
+
+# Paso 1: Contar cuántas veces aparece cada palabra
+conteo = {}
+for palabra in Menu:
+    if palabra in conteo:
+        conteo[palabra] += 1
+    else:
+        conteo[palabra] = 1
+
+# Paso 2: Encontrar la palabra con el mayor conteo
+palabra_mas_repetida = None
+max_repeticiones = 0
+
+for palabra, veces in conteo.items():
+    if veces > max_repeticiones:
+        max_repeticiones = veces
+        palabra_mas_repetida = palabra
+
+# Resultado
+print(f"La palabra más repetida es: '{palabra_mas_repetida}' (aparece {max_repeticiones} veces)")

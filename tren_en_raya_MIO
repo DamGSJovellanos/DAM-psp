@@ -1,0 +1,201 @@
+# ===========================================================
+# FUNCIÓN: crear_tablero()
+# Propósito: Inicializar un tablero vacío de 3x3.
+# Detalle:
+#   - Usamos una "lista por comprensión" para crear 3 filas.
+#   - Cada fila es una lista con 3 espacios en blanco (' '), 
+#     que representan casillas vacías.
+#   - El tablero se estructura como una matriz (lista de listas).
+# ===========================================================
+def crear_tablero():
+    return [[' ' for _ in range(3)] for _ in range(3)]
+
+
+# ===========================================================
+# FUNCIÓN: mostrar_tablero(tablero)
+# Propósito: Mostrar el estado actual del tablero en la consola.
+# Detalle:
+#   - Imprimimos encabezados para columnas (0, 1, 2) para guiar al usuario.
+#   - Usamos enumerate() para obtener el índice (i) y el contenido (fila).
+#   - join() une los elementos de la fila con " | " para el formato típico.
+#   - Imprimimos líneas divisorias ("---------") entre filas (solo 2 veces).
+#   - El \n al inicio da un salto de línea para mejor legibilidad.
+# ===========================================================
+def mostrar_tablero(tablero):
+    print("\n  0   1   2")  # Encabezado de columnas
+    for i, fila in enumerate(tablero):
+        print(f"{i} {' | '.join(fila)}")  # Muestra fila con índice
+        if i < 2:  # Solo entre filas, no al final
+            print("  ---------")
+
+
+# ===========================================================
+# FUNCIÓN: movimiento_valido(tablero, fila, col)
+# Propósito: Verificar si un movimiento es legal.
+# Detalle:
+#   - Primero: ¿está dentro del rango [0, 2]?
+#   - Segundo: ¿la casilla está vacía (' ')?
+#   - Si ambas condiciones se cumplen → movimiento válido.
+#   - Devuelve True o False.
+# ===========================================================
+def movimiento_valido(tablero, fila, col):
+    if 0 <= fila <= 2 and 0 <= col <= 2:  # Dentro del tablero
+        return tablero[fila][col] == ' '   # ¿Está vacía?
+    return False  # Fuera de rango → inválido
+
+
+# ===========================================================
+# FUNCIÓN: hacer_movimiento(tablero, fila, col, jugador)
+# Propósito: Colocar la marca del jugador en una casilla.
+# Detalle:
+#   - Simplemente asigna el símbolo ('X' o 'O') a la posición dada.
+#   - Supone que el movimiento ya fue validado (¡no verifica aquí!).
+# ===========================================================
+def hacer_movimiento(tablero, fila, col, jugador):
+    tablero[fila][col] = jugador
+
+
+# ===========================================================
+# FUNCIÓN: verificar_ganador(tablero, jugador)
+# Propósito: Determinar si un jugador ha ganado.
+# Detalle:
+#   - Revisa las 3 filas: ¿alguna tiene 3 marcas iguales del jugador?
+#   - Revisa las 3 columnas: compara verticalmente.
+#   - Revisa las 2 diagonales manualmente.
+#   - Si encuentra una línea ganadora, devuelve True.
+#   - Si no, devuelve False.
+#   - Esta función se llama después de cada movimiento.
+# ===========================================================
+def verificar_ganador(tablero, jugador):
+    # --- Filas ---
+    for fila in tablero:
+        if fila == [jugador, jugador, jugador]:
+            return True
+
+    # --- Columnas ---
+    for col in range(3):  # col = 0, 1, 2
+        if tablero[0][col] == tablero[1][col] == tablero[2][col] == jugador:
+            return True
+
+    # --- Diagonal principal (de arriba-izquierda a abajo-derecha) ---
+    if tablero[0][0] == tablero[1][1] == tablero[2][2] == jugador:
+        return True
+
+    # --- Diagonal secundaria (de arriba-derecha a abajo-izquierda) ---
+    if tablero[0][2] == tablero[1][1] == tablero[2][0] == jugador:
+        return True
+
+    return False  # No hay línea ganadora
+
+
+# ===========================================================
+# FUNCIÓN: tablero_lleno(tablero)
+# Propósito: Detectar un empate.
+# Detalle:
+#   - Recorre cada fila.
+#   - Si encuentra al menos un espacio vacío (' '), el tablero NO está lleno.
+#   - Si ninguna fila tiene ' ', entonces está lleno → empate posible.
+# ===========================================================
+def tablero_lleno(tablero):
+    for fila in tablero:
+        if ' ' in fila:
+            return False  # Aún hay casillas libres
+    return True  # Todas las casillas están ocupadas
+
+
+# ===========================================================
+# FUNCIÓN: obtener_movimiento(jugador)
+# Propósito: Pedir al usuario su jugada y validar el formato.
+# Detalle:
+#   - Usa un bucle while True para repetir hasta que la entrada sea válida.
+#   - input() captura lo que el usuario escribe.
+#   - split() separa la entrada por espacios (ej: "1 2" → ["1", "2"]).
+#   - map(int, ...) convierte cada parte a entero.
+#   - Si el usuario escribe algo inválido (letras, un solo número, etc.),
+#     se lanza una excepción ValueError → se captura y se pide de nuevo.
+# ===========================================================
+def obtener_movimiento(jugador):
+    while True:
+        try:
+            entrada = input(f"Jugador {jugador}, ingresa fila y columna (ej: 1 2): ")
+            fila, col = map(int, entrada.split())  # Convierte a enteros
+            return fila, col  # Sale del bucle si todo va bien
+        except ValueError:
+            print("Entrada inválida. Usa dos números separados por un espacio (ej: 0 1).")
+
+
+# ===========================================================
+# FUNCIÓN: cambiar_jugador(jugador)
+# Propósito: Alternar entre 'X' y 'O' después de cada turno.
+# Detalle:
+#   - Si el jugador actual es 'X', devuelve 'O'.
+#   - Si es 'O', devuelve 'X'.
+#   - Simple y eficiente con un operador condicional.
+# ===========================================================
+def cambiar_jugador(jugador):
+    return 'O' if jugador == 'X' else 'X'
+
+
+# ===========================================================
+# FUNCIÓN: jugar()
+# Propósito: Coordinar toda la lógica del juego (función principal).
+# Detalle paso a paso:
+#   1. Crea un tablero vacío.
+#   2. Define que empieza el jugador 'X'.
+#   3. Muestra un mensaje de bienvenida.
+#   4. Entra en un bucle infinito que solo termina con break.
+#   5. En cada iteración:
+#        a. Muestra el tablero actual.
+#        b. Pide al jugador actual que haga un movimiento.
+#        c. Si el movimiento es válido:
+#             - Lo aplica al tablero.
+#             - Verifica si ese movimiento hizo ganar al jugador.
+#                 → Si sí: muestra tablero, anuncia ganador y termina.
+#             - Verifica si el tablero está lleno (empate).
+#                 → Si sí: muestra tablero, anuncia empate y termina.
+#             - Cambia de turno.
+#        d. Si el movimiento NO es válido:
+#             - Muestra mensaje de error y repite el turno.
+# ===========================================================
+def jugar():
+    tablero = crear_tablero()      # Paso 1: tablero limpio
+    jugador_actual = 'X'           # Paso 2: empieza X
+
+    print("¡Bienvenido al 3 en raya!")
+    print("Las filas y columnas van de 0 a 2.")  # Guía para el usuario
+
+    while True:  # Bucle principal del juego
+        mostrar_tablero(tablero)
+        fila, col = obtener_movimiento(jugador_actual)
+
+        if movimiento_valido(tablero, fila, col):
+            hacer_movimiento(tablero, fila, col, jugador_actual)
+
+            # ¿Ganó con este movimiento?
+            if verificar_ganador(tablero, jugador_actual):
+                mostrar_tablero(tablero)
+                print(f"¡Felicidades! El jugador {jugador_actual} ha ganado 🎉")
+                break  # Termina el juego
+
+            # ¿Empate?
+            if tablero_lleno(tablero):
+                mostrar_tablero(tablero)
+                print("¡Empate! 🤝")
+                break  # Termina el juego
+
+            # Cambiar turno
+            jugador_actual = cambiar_jugador(jugador_actual)
+
+        else:
+            print("Movimiento inválido. La casilla está ocupada o fuera de rango. Intenta de nuevo.")
+
+
+# ===========================================================
+# BLOQUE DE EJECUCIÓN PRINCIPAL
+# Propósito: Ejecutar el juego solo si el script se corre directamente.
+# Detalle:
+#   - Esta es una buena práctica en Python.
+#   - Permite que el archivo se importe como módulo sin ejecutar el juego.
+# ===========================================================
+if __name__ == "__main__":
+    jugar()
